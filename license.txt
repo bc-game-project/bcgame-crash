@@ -1,0 +1,19 @@
+The following sites have purchased a non-distributable copy of the previous
+version of bustabit's source code, exempting them from the requirements of the
+AGPL:
+
+以下站点购买了前一个站点的不可分发副本
+版本bcgame的源代码，免除他们的要求AGPL:
+
+以下のサイトは、前サイトの配信不可コピーを購入する
+bcgameのソースコードは、彼らの要求agpl:
+ * bc.game
+ 
+Fraudulent sites that are unauthorized to use the bcgame name and brand
+and/or are making false representations about their relationship to bcgame:
+未经授权使用名称和品牌的欺诈网站及/或就其与bcgame的关系作出虚假陈述:
+
+bcgame名やブランド名を不正に使用する詐欺サイト bcgameとの関係について嘘の陳述をする。
+
+* bcgame.co
+ 
