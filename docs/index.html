@@ -181,6 +181,7 @@
         const r = parseInt(seed, 16);
         // 2. X = r / 2^52
         let X = r / Math.pow(2, nBits); // uniformly distributed in [0; 1)
+        X = parseFloat(X.toPrecision(9));
         // 3. X = 99 / (1-X)
         X = 99 / (1 - X);
         // 4. return max(trunc(X), 100)
