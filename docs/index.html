@@ -87,8 +87,7 @@
     </div>
     <hr>
     <div class="container">
-      <p>You can view or download historical statistics here.</p>
-      <p><a target="_blank" href="https://bcsnproject.github.io/HashCheck/#/simple">https://bcsnproject.github.io/HashCheck/#/simple</a></p>
+      <p>We made the decision to update Crash using a salted hash as requested by our players in order to provide the most randomized and fair results possible after Bet <span class="has-text-info"># 2561900</span>. For further details, please visit <a target="_blank" href="https://bitcointalk.org/index.php?topic=5256606">https://bitcointalk.org/index.php?topic=5256606</a></p>
     </div>
     <hr>
     <div class="container">
@@ -96,6 +95,12 @@
         <p class="control has-icons-left">
           <input class="input" type="text" id="game_hash_input" placeholder="Game's hash (SHA256)">
           <span class="icon is-small is-left"><i class="fa fa-key"></i></span>
+        </p>
+      </div>
+      <div class="field">
+        <p class="control has-icons-left">
+          <input class="input" type="text" id="game_salt_input" placeholder="Salt" value="0000000000000000000e3a66df611d6935b30632f352e4934c21059696117f28">
+          <span class="icon is-small is-left"><i class="fa fa-filter"></i></span>
         </p>
       </div>
       <div class="field">
@@ -135,7 +140,7 @@
         let prevHash = null;
         for (let i = 0; i < $('#game_amount_input').val(); i++) {
           let hash = String(prevHash ? CryptoJS.SHA256(String(prevHash)) : $('#game_hash_input').val());
-          let bust = gameResult(hash);
+          let bust = gameResult(hash, $('#game_salt_input').val());
           setTimeout(function() {
             addTableRow(hash, bust, i)
           }, i * 1);
@@ -174,17 +179,27 @@
           isVerifying = false;
         }
       };
-      const gameResult = (seed) => {
+      const gameResult = (seed, salt) => {
         const nBits = 52; // number of most significant bits to use
-        // 1. r = 52 most significant bits
+
+        // 1. HMAC_SHA256(message=seed, key=salt)  
+        if (salt) {
+          const hmac = CryptoJS.HmacSHA256(CryptoJS.enc.Hex.parse(seed), salt);
+          seed = hmac.toString(CryptoJS.enc.Hex);
+        }
+
+        // 2. r = 52 most significant bits
         seed = seed.slice(0, nBits / 4);
         const r = parseInt(seed, 16);
-        // 2. X = r / 2^52
+
+        // 3. X = r / 2^52
         let X = r / Math.pow(2, nBits); // uniformly distributed in [0; 1)
         X = parseFloat(X.toPrecision(9));
-        // 3. X = 99 / (1-X)
+
+        // 4. X = 99 / (1-X)
         X = 99 / (1 - X);
-        // 4. return max(trunc(X), 100)
+
+        // 5. return max(trunc(X), 100)
         const result = Math.floor(X);
         return Math.max(1, result / 100);
       };
@@ -199,8 +214,11 @@
         }
       };
       var hash_url = window.location.search
-      if ((/\?hash=/).test(hash_url)) {
-        var hash = hash_url.replace(/\?hash=/, '')
+      if ((/nosalt/).test(hash_url)) {
+        $('#game_salt_input').val('');
+      }
+      if ((/hash=/).test(hash_url)) {
+        var hash = hash_url.match(/(?<=hash=).*?(?=&|$)/)[0];
         $('#game_hash_input').val(hash)
         $('#game_verify_submit').click()
       }
